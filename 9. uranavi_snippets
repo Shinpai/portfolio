@@ -1,0 +1,62 @@
+'''
+@haeejuut
+Tähän tiedostoon on kerätty muutamia koodinpätkiä esimerkiksi uranavigaattori- sovelluksesta
+'''
+# HTML 
+# angular loop ja luokka, sekä filteri
+<div class="well">
+	<small>{{'amm_liittyvat_kurssit' | translate}}</small>
+	    <div class="row" ng-repeat="kurssi in content.kurssi | orderBy: ['-kayty','-koodi']">
+	        <div class="list-group-item" ng-class="asetaVari(kurssi)">
+		        <a target="_blank" ng-href={{kurssi.linkki}}>{{kurssi.nimi}} - {{kurssi.koodi}}</a>
+		</div>
+	</div>
+</div>
+
+
+# JS
+/**
+* Jos request kestää enemmän kuin 200ms: ts scoredatan haku, näyttää lataus overlayn
+*/
+$scope.$watch( function() {return $http.pendingRequests.length > 0;},
+	$timeout (function(isPending)  {if (!isPending) $scope.ladataan_pistedataa = false;}),200);	
+
+/**
+* Katsoo onko käyttäjä kirjautunut ja hakee tunnuksen
+*/
+var user_promise = $http.get("/hae_kayttajanimi");
+user_promise
+	.then(function(data, status, headers, config) {		
+		$scope.kirjautunut_bool = true;			
+		$scope.loggedUser = data.data;
+}),
+	function error() {console.log(error + ": Kirjautuminen epäonnistui");};
+
+
+# Flask
+
+@app.route('/ilmoita_bugi', methods=['GET','POST'])
+def ilmoita_bugi():
+    '''
+    Tallentaa käyttäjän lomakkeella ilmoittaman virheen.
+    '''
+    if request.method == 'POST':
+        viesti = request.data
+        laheta_raportti(viesti)
+    return 'Sending succeeded'        
+
+@app.route('/hae_jarjestys', methods=['POST'])
+def hae_jarjestys():
+    '''
+    Palauttaa listan kaikista tietokannassa olevista ammateista ja
+    jokaiselle lasketuista sopivuuspisteistä annetun kurssikoodilistan
+    perusteella.
+    '''
+    data = request.data
+    try:
+        kurssit = eval(data)
+    except NameError:
+        return parameter_invalid
+    if kurssit:
+        return json.dumps(listaa_sopivimmat.arvot(kurssit))
+    return parameter_invalid
