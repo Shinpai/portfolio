@@ -1,0 +1,2 @@
+# portfolio
+Kerättyjä poimintoja koodista
