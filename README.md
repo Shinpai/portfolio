@@ -1,5 +1,5 @@
 # portfolio
-Kerättyjä poimintoja koodista
+Kerättyjä poimintoja tehdystä koodista
 
 1. audiotallennus suoraan windows- ulostulosta
 2. blockchain komentoja Ethereum hallintaan
